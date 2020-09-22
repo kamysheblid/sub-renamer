@@ -7,4 +7,5 @@
   video file name but with its own subtitle extension.
 
 ** License
-   See LICENSE file
+   GPLv3.
+   See LICENSE file for more information.
