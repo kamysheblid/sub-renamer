@@ -1,0 +1,10 @@
+* sub-renamer
+  It is a python program to automatically rename subtitle files to
+  their corresponding video filenames.
+
+  It does this by using regexpressions to find similar season and
+  episode numbers and then changing the subtitle name to that same
+  video file name but with its own subtitle extension.
+
+** License
+   See LICENSE file
