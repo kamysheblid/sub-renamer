@@ -55,8 +55,7 @@ for elt in sorted(subtitles):
         if not args.quiet:
             print('{0} -> {1}'.format(subtitle.filename,new_sub_filename))
         if not args.trial:
-            print(new_sub_filename)
-            # os.rename(subtitle.filename,new_sub_filename)
+            os.rename(subtitle.filename,new_sub_filename)
 
     elif args.verbose:
         print('Video for S{0}E{1} not found'.format(elt[0],elt[1]))
