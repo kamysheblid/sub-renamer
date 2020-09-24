@@ -8,7 +8,7 @@ setuptools.setup(
     version = "0.0.1",
     author = "Kamy Sheblid",
     author_email = "kamysheblid@gmail.com",
-    description = "Automatically rename subtitles filenames to their matching video filenames."
+    description = "Automatically rename subtitles filenames to their matching video filenames.",
     long_description = long_description,
     long_description_content_type = "text/html",
     url = "https://github.com/kamysheblid/sub-renamer",
