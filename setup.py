@@ -4,7 +4,7 @@ with open("README.html","r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name = "sub-renamer-kamysheblid",
+    name = "sub-renamer",
     version = "0.0.1",
     author = "Kamy Sheblid",
     author_email = "kamysheblid@gmail.com",
