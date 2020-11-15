@@ -2,7 +2,6 @@
 import os, argparse, logging, pathlib
 from Levenshtein import distance
 from episode import Episode
-from pprint import pprint
 
 # Get command line arguments and give help
 parser = argparse.ArgumentParser(description=f'This program will automatically rename subtitles to match video filenames so your mediaplayer automatically finds them. If you do not give it a directory with -d then it looks in the current directory. Does not change filenames by default until you enable --force option')
