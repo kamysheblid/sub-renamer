@@ -9,10 +9,10 @@ class Episode:
 Just feed it a filename, and it will use module re (regexp) to find out what season and episode the file is. 
 '''
     def __init__(self,filename):
-        self.filename = filename
+        self.file = pathlib.PosixPath(self.filename)
+        self.filename = self.file.name
         self.season = self.get_season()
         self.episode = self.get_episode()
-        self.suffix = self.get_suffix()
         return
 
     def __str__(self):
@@ -27,9 +27,3 @@ Just feed it a filename, and it will use module re (regexp) to find out what sea
         episode = re_episode.search(self.filename)
         if not episode: return
         return episode.group(2) if episode.re.groups == 2 else None
-
-    def get_suffix(self):
-        return pathlib.PosixPath(self.filename).suffix.strip('.')
-
-    def subtitle_rename(self,video):
-        return re.sub(video.suffix,self.suffix,video.filename)
