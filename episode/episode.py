@@ -9,7 +9,7 @@ class Episode:
 Just feed it a filename, and it will use module re (regexp) to find out what season and episode the file is. 
 '''
     def __init__(self,filename):
-        self.file = pathlib.PosixPath(self.filename)
+        self.file = pathlib.PosixPath(filename)
         self.filename = self.file.name
         self.season = self.get_season()
         self.episode = self.get_episode()
