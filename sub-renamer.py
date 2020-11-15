@@ -62,5 +62,5 @@ for video in videos:
         print(f'Changing \"{sub_match}\" -> \"{new_subtitle_filename}\"')
         if args.force:
             sub_match.rename(new_subtitle_filename)
-    elif args.verbose:
+    else:
         logging.error(f'S{video.season}E{video.episode} not found for {video.filename}')
