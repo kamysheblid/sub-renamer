@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os, argparse, logging, pathlib
 from Levenshtein import distance
-from episode import Episode
+from episode.episode import Episode
 
 # Get command line arguments and give help
 parser = argparse.ArgumentParser(description=f'This program will automatically rename subtitles to match video filenames so your mediaplayer automatically finds them. If you do not give it a directory with -d then it looks in the current directory. Does not change filenames by default until you enable --force option')
@@ -47,7 +47,7 @@ except FileNotFoundError:
     exit(1)
 
 subtitles = sorted([pathlib.Path(filename) for filename in os.listdir() if is_sub(filename)])
-videos = sorted([Episode(filename) for filename in os.listdir() if is_video(filename)], key=lambda ep: ep.filename)
+videos = sorted([Episode(filename) for filename in os.listdir() if is_video(filename)], key=lambda ep: ep.file.name)
 
 logging.debug(f'Subtitles found: {[sub.name for sub in subtitles]}')
 logging.debug(f'Videos found: {[video.filename for video in videos]}')
