@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-09-23 Wed 22:50 -->
+<!-- 2020-11-14 Sat 23:21 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -39,7 +39,7 @@
   }
   pre.src {
     position: relative;
-    overflow: visible;
+    overflow: auto;
     padding-top: 1.2em;
   }
   pre.src:before {
@@ -193,50 +193,26 @@
   /*]]>*/-->
 </style>
 <script type="text/javascript">
-/*
-@licstart  The following is the entire license notice for the
-JavaScript code in this tag.
-
-Copyright (C) 2012-2020 Free Software Foundation, Inc.
-
-The JavaScript code in this tag is free software: you can
-redistribute it and/or modify it under the terms of the GNU
-General Public License (GNU GPL) as published by the Free Software
-Foundation, either version 3 of the License, or (at your option)
-any later version.  The code is distributed WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
-
-As additional permission under GNU GPL version 3 section 7, you
-may distribute non-source (e.g., minimized or compacted) forms of
-that code without the copy of the GNU GPL normally required by
-section 4, provided you include this license notice and a URL
-through which recipients can access the Corresponding Source.
-
-
-@licend  The above is the entire license notice
-for the JavaScript code in this tag.
-*/
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
 <!--/*--><![CDATA[/*><!--*/
- function CodeHighlightOn(elem, id)
- {
-   var target = document.getElementById(id);
-   if(null != target) {
-     elem.cacheClassElem = elem.className;
-     elem.cacheClassTarget = target.className;
-     target.className = "code-highlighted";
-     elem.className   = "code-highlighted";
-   }
- }
- function CodeHighlightOff(elem, id)
- {
-   var target = document.getElementById(id);
-   if(elem.cacheClassElem)
-     elem.className = elem.cacheClassElem;
-   if(elem.cacheClassTarget)
-     target.className = elem.cacheClassTarget;
- }
-/*]]>*///-->
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
 </script>
 </head>
 <body>
@@ -245,32 +221,44 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org7b0412d">1. sub-renamer</a>
+<li><a href="#orge357b09">1. sub-renamer</a>
 <ul>
-<li><a href="#orgd3618d4">1.1. License</a></li>
+<li><a href="#org003992f">1.1. Dependencies</a></li>
+<li><a href="#orgf74b58f">1.2. License</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org7b0412d" class="outline-2">
-<h2 id="org7b0412d"><span class="section-number-2">1</span> sub-renamer</h2>
+<div id="outline-container-orge357b09" class="outline-2">
+<h2 id="orge357b09"><span class="section-number-2">1</span> sub-renamer</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-It is a python program to automatically rename subtitle files to
-their corresponding video filenames.
+A python program to automatically rename subtitle files to their
+corresponding video filenames.
 </p>
 
 <p>
-It does this by using regexpressions to find similar season and
-episode numbers and then changing the subtitle name to that same
-video file name but with its own subtitle extension.
+It does this by using regex to find similar season and episode
+numbers, filters the subtitles to filenames containing the episode
+number, looks for the closest subtitle using the Levenshtein
+distance function, and then changing the subtitle name to that same
+video file name but with its subtitle extension.
 </p>
 </div>
 
-<div id="outline-container-orgd3618d4" class="outline-3">
-<h3 id="orgd3618d4"><span class="section-number-3">1.1</span> License</h3>
+<div id="outline-container-org003992f" class="outline-3">
+<h3 id="org003992f"><span class="section-number-3">1.1</span> Dependencies</h3>
 <div class="outline-text-3" id="text-1-1">
+<ul class="org-ul">
+<li><a href="https://pypi.org/project/python-Levenshtein/">python-Levenshtein 0.12.0</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgf74b58f" class="outline-3">
+<h3 id="orgf74b58f"><span class="section-number-3">1.2</span> License</h3>
+<div class="outline-text-3" id="text-1-2">
 <p>
 GPLv3.
 See LICENSE file for more information.
@@ -280,8 +268,8 @@ See LICENSE file for more information.
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2020-09-23 Wed 22:50</p>
-<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+<p class="date">Created: 2020-11-14 Sat 23:21</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
 </html>
