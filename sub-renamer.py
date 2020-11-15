@@ -1,61 +1,67 @@
 #!/usr/bin/env python3
-import os, argparse
+import os, argparse, logging, pathlib
+from Levenshtein import distance
 from episode import Episode
-
-SUB_EXTS = ['srt','ass','ssa','vtt']
-VID_EXTS = ['avi','mp4','mpeg','mkv']
+from pprint import pprint
 
 # Get command line arguments and give help
-parser = argparse.ArgumentParser(description='This program will automatically rename subtitles to match video filenames so your mediaplayer automatically finds them. If you do not give it a directory with -d then it looks in the current directory. The program looks for the video extensions {0}, and the subtitle extensions {1} if it is not told to be more specific with -V and -S options.'.format(VID_EXTS,SUB_EXTS))
+parser = argparse.ArgumentParser(description=f'This program will automatically rename subtitles to match video filenames so your mediaplayer automatically finds them. If you do not give it a directory with -d then it looks in the current directory. Does not change filenames by default until you enable --force option')
 
-parser.add_argument('--directory','-d',help='Directory to edit filenames.',default=os.getcwd())
-parser.add_argument('--video','-V',help='Give video extension to only find videos with this exact extension.',default=VID_EXTS)
-parser.add_argument('--sub','-S',help='Give subs extension to only rename subs with this exact extension.',default=SUB_EXTS)
-parser.add_argument('--trial','-n',action='store_true',help='No action: print names of files to be renamed, but do not rename.',default=False)
-parser.add_argument('--verbose','-v',action='store_true',help='Verbose: print names of files that are not changed and their season and episode numbers.')
-parser.add_argument('--quiet','-q',action='store_true',help='Be less verbose, i.e. hide filename changes.')
+parser.add_argument('-d','--directory',help='Directory to edit filenames.',default=os.getcwd())
+parser.add_argument('-V','--video',help='Give video extension to only find videos with this exact extension.',default=['avi','mp4','mpeg','mkv'])
+parser.add_argument('-S','--sub',help='Give subs extension to only rename subs with this exact extension.',default=['srt','ass','ssa','vtt'])
+parser.add_argument('-f','--force',action='store_true',help='Carry out renaming files.',default=False)
+parser.add_argument('-v','--verbose',action='store_true',default=False,help='Verbose: print more info.')
+parser.add_argument('-vv','--debug',action='store_true',default=False,help='More Verbose: print debug info.')
+parser.add_argument('-q','--quiet',action='store_true',default=False,help='Be less verbose, i.e. hide filename changes.')
 
 args = parser.parse_args()
-
-# Print a newline to make it easier to read
-print()
 
 SUB_EXTS = args.sub
 VID_EXTS = args.video
 
+if args.verbose:
+    logging.basicConfig(level=logging.INFO)
+elif args.quiet:
+    logging.basicConfig(level=logging.ERROR)
+elif args.debug:
+    logging.basicConfig(level=logging.DEBUG)
+
+if args.force:
+    print('Program will change names of all matching subtitles found.')
+else:
+    print('Program will not change any subtitle names. To change names, call with -f option')
+
+def is_sub(filename):
+    logging.debug(f'Searching {filename} for {SUB_EXTS} suffix')
+    return any([True for ext in SUB_EXTS if filename.endswith('.'+ext)])
+
+def is_video(filename):
+    logging.debug(f'Searching {filename} for {VID_EXTS} suffix')
+    return any([True for ext in VID_EXTS if filename.endswith('.'+ext)])
+
 try:
+    logging.debug(f'Attempting to Change directory to {args.directory}')
     os.chdir(args.directory)
 except FileNotFoundError:
-    print('No such directory:',args.directory)
+    logging.error(f'No such directory: {args.directory}')
     exit(1)
 
-# Separate the subs and vids, put them in
-# separate dicts so they can be searched
-subtitles = dict()
-videos = dict()
-for f in os.listdir():
-    ep = Episode(f)
-    # If it cannot parse, then just move on
-    if not ep.episode:
-        continue
-    if ep.suffix:
-        if ep.suffix in SUB_EXTS:
-            subtitles.update({(ep.season,ep.episode):ep})
-        elif ep.suffix in VID_EXTS:
-            videos.update({(ep.season,ep.episode):ep})
+subtitles = sorted([pathlib.Path(filename) for filename in os.listdir() if is_sub(filename)])
+videos = sorted([Episode(filename) for filename in os.listdir() if is_video(filename)], key=lambda ep: ep.filename)
 
-# Combine the matching subs and vids
-for elt in sorted(subtitles):
-    if elt in videos.keys():
-        subtitle = subtitles[elt]
-        video = videos[elt]
+logging.debug(f'Subtitles found: {[sub.name for sub in subtitles]}')
+logging.debug(f'Videos found: {[video.filename for video in videos]}')
 
-        new_sub_filename = subtitle.subtitle_rename(video)
-
-        if not args.quiet:
-            print('{0} -> {1}'.format(subtitle.filename,new_sub_filename))
-        if not args.trial:
-            os.rename(subtitle.filename,new_sub_filename)
-
+for video in videos:
+    logging.debug(f'Searching for {video.filename}')
+    sub_matches = [(distance(video.filename,sub.name),sub) for sub in subtitles if video.episode in sub.name]
+    logging.info(f'Found matches: {sub_matches}')
+    if sub_matches:
+        sub_match = sorted(sub_matches, key=lambda x: x[0] if x else None)[0][1]
+        new_subtitle_filename = video.file.with_suffix(sub_match.suffix)
+        print(f'Changing \"{sub_match}\" -> \"{new_subtitle_filename}\"')
+        if args.force:
+            sub_match.rename(new_subtitle_filename)
     elif args.verbose:
-        print('Video for S{0}E{1} not found'.format(elt[0],elt[1]))
+        logging.error(f'S{video.season}E{video.episode} not found for {video.filename}')
