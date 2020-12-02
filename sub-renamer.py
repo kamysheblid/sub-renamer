@@ -41,8 +41,8 @@ def get_args():
 
     if ns.args.force:
         print('WARNING: Program will change names of all matching subtitles found.')
-    else:
-        print('\nNOTE: To change subtitle names automatically, call with -f option or type ! when it asks for input.\n')
+    elif not ns.args.quiet:
+        print('NOTE: To change subtitle names automatically, call with -f option or type ! when it asks for input.')
 
     try:
         logging.debug(f'Attempting to Change directory to {ns.args.directory}')
@@ -114,8 +114,9 @@ def rename_files(matches_list):
         are_you_sure = False
         new_subtitle_filename = sub_match.new_filename(video)
 
+        print(f'\"{sub_match.filename}\" -> \"{new_subtitle_filename}\"') if not ns.args.force else None
         if not ns.args.force and not ns.args.test:
-            check = input(f'Renaming \"{sub_match.filename}\" -> \"{new_subtitle_filename}\" Are you sure you want to continue [y/!/n/N]: ')
+            check = input('Would you like to rename? [y/!/n/N]: ')
             if check == '!':
                 ns.args.force = True
             elif check == 'N':
