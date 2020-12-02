@@ -8,16 +8,17 @@ class Namespace:
         return
 
 ns = Namespace()
-
+ns.VID_EXTS = ['avi','mp4','mpeg','mkv']
+ns.SUB_EXTS = ['srt','ass','ssa','vtt']
 
 def get_args():
     # Get command line arguments and give help
-    parser = argparse.ArgumentParser(description=f'This program will automatically rename subtitles to match video filenames so your mediaplayer automatically finds them. If you do not give it a directory with -d then it looks in the current directory. Does not change filenames by default until you enable --force option')
+    parser = argparse.ArgumentParser(description=f'This program renames subtitle filenames to match video filenames so your mediaplayer (ex. VLC) automatically finds them.')
 
-    parser.add_argument('-d','--directory',action='append',help='Directory to edit filenames.',default=os.getcwd())
-    parser.add_argument('-V','--video',action='store',help='Give video extension to only find videos with this exact extension.',default=['avi','mp4','mpeg','mkv'],nargs='+')
-    parser.add_argument('-S','--sub',help='Give subs extension to only rename subs with this exact extension.',default=['srt','ass','ssa','vtt'],nargs='+')
-    parser.add_argument('-f','--force',action='store_true',help='Carry out renaming files.',default=False)
+    parser.add_argument('-d','--directory',action='store',help='Directory containing videos and subtitles.',default=os.getcwd())
+    parser.add_argument('-V','--video',action='store',help='List of video suffixes to only find videos with these exact suffixes.',default=ns.VID_EXTS,nargs='+')
+    parser.add_argument('-S','--sub',help='List of subtitle suffixes to only rename subs with these exact suffixes.',default=ns.SUB_EXTS,nargs='+')
+    parser.add_argument('-f','--force',action='store_true',help='Rename all files without prompting you.',default=False)
     parser.add_argument('-t','--test',action='store_true',help='Do not rename any files, just show what would happen.',default=False)
     parser.add_argument('-v','--verbose',action='store_true',default=False,help='Verbose: print more info.')
     parser.add_argument('-vv','--debug',action='store_true',default=False,help='More Verbose: print debug info.')
@@ -42,7 +43,7 @@ def get_args():
     if ns.args.force:
         print('WARNING: Program will change names of all matching subtitles found.')
     elif not ns.args.quiet:
-        print('NOTE: To change subtitle names automatically, call with -f option or type ! when it asks for input.')
+        print('NOTE: To change subtitle names without asking you each time just call with -f option or type ! when it asks for input.')
 
     try:
         logging.debug(f'Attempting to Change directory to {ns.args.directory}')
@@ -126,9 +127,12 @@ def rename_files(matches_list):
             else:
                 are_you_sure = False
 
-        if ns.args.force or are_you_sure and not ns.args.test:
-            print(f'Renamed \"{sub_match.filename}\" -> \"{new_subtitle_filename}\"') if ns.args.force else None
-            sub_match.file.rename(new_subtitle_filename)
+        if (ns.args.force or are_you_sure) and not ns.args.test:
+            print(f'Renaming \"{sub_match.filename}\" -> \"{new_subtitle_filename}\"') if ns.args.force else None
+            try:
+                sub_match.file.rename(new_subtitle_filename)
+            except:
+                logging.error('Renaming file failed. Make sure you have permission to rename the file.')
     return
 
 if __name__ == '__main__':
