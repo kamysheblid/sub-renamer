@@ -42,7 +42,7 @@ def get_args():
     if ns.args.force:
         print('WARNING: Program will change names of all matching subtitles found.')
     else:
-        print('\nNOTE: Program will not change any subtitle names. To change names, call with -f option\n')
+        print('\nNOTE: To change subtitle names automatically, call with -f option or type ! when it asks for input.\n')
 
     try:
         logging.debug(f'Attempting to Change directory to {ns.args.directory}')
