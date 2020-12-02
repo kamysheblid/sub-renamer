@@ -17,7 +17,8 @@ Just feed it a filename, and it will use module re (regexp) to find out what sea
 
     def __str__(self):
         return 'S{0}E{1} : {2}'.format(self.season,self.episode,self.filename)
-
+    def __gt__(self, ep):
+        return self.filename > ep.filename
     def get_season(self):
         season = re_season.search(self.filename)
         if not season: return

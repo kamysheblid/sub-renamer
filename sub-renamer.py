@@ -2,10 +2,18 @@
 import os, argparse, logging, pathlib
 from Levenshtein import distance
 from episode.episode import Episode
-from gooey import Gooey
+#from gooey import Gooey
 
-@Gooey
-def main():
+class Namespace:
+    def __init__(self):
+        return
+
+ns = Namespace()
+
+logging.basicConfig(level=logging.ERROR)
+args = 0
+
+def get_args():
     # Get command line arguments and give help
     parser = argparse.ArgumentParser(description=f'This program will automatically rename subtitles to match video filenames so your mediaplayer automatically finds them. If you do not give it a directory with -d then it looks in the current directory. Does not change filenames by default until you enable --force option')
 
@@ -17,15 +25,14 @@ def main():
     parser.add_argument('-vv','--debug',action='store_true',default=False,help='More Verbose: print debug info.')
     parser.add_argument('-q','--quiet',action='store_true',default=False,help='Be less verbose, i.e. hide filename changes.')
 
+    global args
     args = parser.parse_args()
 
-    SUB_EXTS = args.sub
-    VID_EXTS = args.video
+    ns.SUB_EXTS = args.sub
+    ns.VID_EXTS = args.video
 
     if args.verbose:
         logging.basicConfig(level=logging.INFO)
-    elif args.quiet:
-        logging.basicConfig(level=logging.ERROR)
     elif args.debug:
         logging.basicConfig(level=logging.DEBUG)
 
@@ -34,13 +41,6 @@ def main():
     else:
         print('Program will not change any subtitle names. To change names, call with -f option')
 
-    def is_sub(filename):
-        logging.debug(f'Searching {filename} for {SUB_EXTS} suffix')
-        return any([True for ext in SUB_EXTS if filename.endswith('.'+ext)])
-
-    def is_video(filename):
-        logging.debug(f'Searching {filename} for {VID_EXTS} suffix')
-        return any([True for ext in VID_EXTS if filename.endswith('.'+ext)])
 
     try:
         logging.debug(f'Attempting to Change directory to {args.directory}')
@@ -49,24 +49,58 @@ def main():
         logging.error(f'No such directory: {args.directory}')
         exit(1)
 
-    subtitles = sorted([pathlib.Path(filename) for filename in os.listdir() if is_sub(filename)])
-    videos = sorted([Episode(filename) for filename in os.listdir() if is_video(filename)], key=lambda ep: ep.file.name)
+    return args
 
-    logging.debug(f'Subtitles found: {[sub.name for sub in subtitles]}')
+
+def is_sub(filename):
+    logging.debug(f'Searching {filename} for {ns.SUB_EXTS} suffix')
+    return any([True for ext in ns.SUB_EXTS if filename.endswith('.'+ext)])
+
+def is_video(filename):
+    logging.debug(f'Searching {filename} for {ns.VID_EXTS} suffix')
+    return any([True for ext in ns.VID_EXTS if filename.endswith('.'+ext)])
+
+def match_subs():
+    subtitles = sorted([Episode(filename) for filename in os.listdir() if is_sub(filename)])
+    videos = sorted([Episode(filename) for filename in os.listdir() if is_video(filename)])
+
+    logging.debug(f'Subtitles found: {[sub.filename for sub in subtitles]}')
     logging.debug(f'Videos found: {[video.filename for video in videos]}')
 
+    matched = []
+
     for video in videos:
-        logging.debug(f'Searching for {video.filename}')
-        sub_matches = [(distance(video.filename,sub.name),sub) for sub in subtitles if video.episode in sub.name]
-        logging.info(f'Found matches: {sub_matches}')
-        if sub_matches:
-            sub_match = sorted(sub_matches, key=lambda x: x[0] if x else None)[0][1]
-            new_subtitle_filename = video.file.with_suffix(sub_match.suffix)
-            print(f'Changing \"{sub_match}\" -> \"{new_subtitle_filename}\"')
-            if args.force:
-                sub_match.rename(new_subtitle_filename)
-        else:
-            logging.error(f'S{video.season}E{video.episode} not found for {video.filename}')
+        logging.debug(f'Searching for matching subtitle for video file {video.filename}')
+
+        #try to fit the subtitles into the Episode class as well, if it fails use alternative method below
+        try:
+            logging.debug(f'Searching for subtitles using Episode class')
+            sub_matches = list(filter(lambda sub: sub.episode == video.episode and sub.season == video.season, subtitles))
+            if len(sub_matches) == 1:
+                matched.append((video,sub_matches[0]))
+        except:
+            logging.debug(f'Search failed \nUsing alternative method')
+            sub_matches = [(distance(video.filename,sub.filename),sub) for sub in subtitles if video.episode in sub.filename]
+            logging.info(f'Found matches: {sub_matches}')
+            if sub_matches:
+                # sub_match = sorted(sub_matches, key=lambda x: x[0] if x else None)[0]
+                sub_match = sorted(sub_matches)[0]
+                matched.append((video,sub_match))
+            else:
+                logging.error(f'S{video.season}E{video.episode} not found for {video.filename}')
+
+    return matched
+
+def rename_files(matches_list):
+    for video,sub_match in matches_list:
+        new_subtitle_filename = video.file.with_suffix(sub_match.file.suffix)
+        print(f'Changing \"{sub_match}\" -> \"{new_subtitle_filename}\"')
+        if args.force:
+            sub_match.rename(new_subtitle_filename)
+    return
 
 if __name__ == '__main__':
-    main()
+    get_args()
+    matches = match_subs()
+    print(len(matches))
+    rename_files(matches)
