@@ -83,7 +83,6 @@ def match_subs():
             sub_matches = [(distance(video.filename,sub.filename),sub) for sub in subtitles if video.episode in sub.filename]
             logging.info(f'Found matches: {sub_matches}')
             if sub_matches:
-                # sub_match = sorted(sub_matches, key=lambda x: x[0] if x else None)[0]
                 sub_match = sorted(sub_matches)[0]
                 matched.append((video,sub_match))
             else:
@@ -96,7 +95,7 @@ def rename_files(matches_list):
         new_subtitle_filename = video.file.with_suffix(sub_match.file.suffix)
         print(f'Changing \"{sub_match}\" -> \"{new_subtitle_filename}\"')
         if args.force:
-            sub_match.rename(new_subtitle_filename)
+            sub_match.file.rename(new_subtitle_filename)
     return
 
 if __name__ == '__main__':
