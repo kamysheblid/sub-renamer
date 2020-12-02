@@ -2,13 +2,15 @@
   A python program to automatically rename subtitle files to their
   corresponding video filenames.
 
-  It does this by using regex to find similar season and episode
-  numbers, filters the subtitles to filenames containing the episode
-  number, looks for the closest subtitle using the Levenshtein
-  distance function, and then changing the subtitle name to that same
-  video file name but with its subtitle extension.
-  
-** Dependencies
+  It does this by parsing season and episode numbers using regex to
+  find similar season and episode numbers for subtitles and videos,
+  then renames the subtitle filenames to matching video filenames.
+
+  If the first method fails it can use an optional dependency to find
+  the Levenshtein distance between video and subtitle filenames to
+  attempt to match them.
+
+** Optional Dependencies
    * [[https://pypi.org/project/python-Levenshtein/][python-Levenshtein 0.12.0]]
 
 ** License

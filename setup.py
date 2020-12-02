@@ -11,11 +11,10 @@ setuptools.setup(
     long_description_content_type = "text/html",
     url = "https://github.com/kamysheblid/sub-renamer",
     packages = setuptools.find_packages(),
-    # packages = ['episode'],
     classifiers = [
         "Topic::Utilies",],
     python_requires = '>=3.7',
     scripts = ['sub-renamer.py'],
-    install_requires = [
+    extra_requires = [
         'python-Levenshtein'],
     )
