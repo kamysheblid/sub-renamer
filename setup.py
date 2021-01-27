@@ -7,8 +7,8 @@ setuptools.setup(
     author = "Kamy Sheblid",
     author_email = "kamysheblid@gmail.com",
     description = "Automatically rename subtitles filenames to their matching video filenames.",
-    long_description = open('README.html').read(),
-    long_description_content_type = "text/html",
+    long_description = open('README.org').read(),
+    long_description_content_type = "text/plain",
     url = "https://github.com/kamysheblid/sub-renamer",
     packages = setuptools.find_packages(),
     classifiers = [
