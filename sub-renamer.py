@@ -117,17 +117,15 @@ def rename_files(matches_list):
 
         print(f'\"{sub_match.filename}\" -> \"{new_subtitle_filename}\"') if not ns.args.force else None
         if not ns.args.force and not ns.args.test:
-            check = None
-            while !check:
-                check = input('Would you like to rename? [y/!/n/N]: ')
-                if check == '!':
-                    ns.args.force = True
-                elif check.lower() == 'N':
-                    ns.args.test = True
-                elif check == 'y':
-                    are_you_sure = True
-                el:
-                    are_you_sure = False
+            check = input('Would you like to rename? [y/!/n/N]: ')
+            if check == '!':
+                ns.args.force = True
+            elif check.lower() == 'N':
+                ns.args.test = True
+            elif check == 'y':
+                are_you_sure = True
+            else:
+                are_you_sure = False
 
         if (ns.args.force or are_you_sure) and not ns.args.test:
             print(f'Renaming \"{sub_match.filename}\" -> \"{new_subtitle_filename}\"') if ns.args.force else None
