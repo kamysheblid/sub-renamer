@@ -91,8 +91,9 @@ def match_subs():
         try:
             logging.debug(f'Searching for subtitles using Episode class')
             sub_matches = list(filter(lambda sub: sub.episode == video.episode and sub.season == video.season, subtitles))
-            if len(sub_matches) == 1:
-                matched.append((video,sub_matches[0]))
+            logging.debug(f'Found matches: {sub_matches}')
+            if len(sub_matches) > 0:
+                [matched.append((video,match)) for match in sub_matches]
         except:
             logging.debug(f'Search failed. Using alternative method')
             if not importlib.util.find_spec('Levenshtein'):
@@ -112,6 +113,7 @@ def match_subs():
 
 def rename_files(matches_list):
     for video,sub_match in matches_list:
+        logging.debug(f'Matching video {video} with {sub_match}')
         are_you_sure = False
         new_subtitle_filename = sub_match.new_filename(video)
 

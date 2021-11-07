@@ -3,7 +3,7 @@ import re, pathlib, logging
 # regex to find season and episode info on files
 re_season = re.compile(r'([Ss](eason|EASON|eries|ERIES)*)[ \.-]*([0-9]{1,2})')
 re_episode = re.compile(r'([Ee](pisode|pISODE)*)[ .-]*([0-9]{1,2})')
-
+re_altSearch = re.compile(r'([0-9]+)x([0-9]+)')
 class Episode:
     '''This class stores information about an episode.
 Just feed it a filename, and it will use module re (regexp) to find out what season and episode the file is. 
@@ -11,8 +11,13 @@ Just feed it a filename, and it will use module re (regexp) to find out what sea
     def __init__(self,filename,suffix=None):
         self.file = pathlib.PosixPath(filename)
         self.filename = self.file.name
+
         self.season = self.get_season()
-        self.episode = self.get_episode()
+        if self.season:
+            self.episode = self.get_episode()
+        else:
+            results = [int(i) for i in re_altSearch.search(self.filename).groups()]
+            self.season, self.episode = results if size(results) == 2 else None
         self.suffix = self.get_suffix(suffix)
         return
     def __str__(self):
